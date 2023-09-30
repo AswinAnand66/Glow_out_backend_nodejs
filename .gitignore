@@ -1,0 +1,4 @@
+tsserver/dist
+tsserver/node_modules
+tsserver/log
+tsserver/package-lock.json
