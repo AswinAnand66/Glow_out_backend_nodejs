@@ -6,7 +6,7 @@ const path = require("path");
 const router = Router();
 const config = require("../config/constants");
 const usrCntrl = require("../controllers/userController");
-const glowOutCntrl = require("../controllers/glowOutController");
+const GlowOutCntrl = require("../controllers/glowOutController");
 const cmn = require("../controllers/initializeController");
 const mailServiceCntrl = require("../controllers/mailServiceController");
 const forgotPasswordCntrl = require("../controllers/forgotPasswordController");
@@ -36,42 +36,9 @@ function accessLog(req:any, duration:number, status:boolean) {
     log.accesslog("info", `${getRequestIP(req)}, ${req.url}, ${status}, ${duration}`);
 }
 
-// cron.schedule('0 0 15,20,25 * *', async () => {
-//   const now = new Date();
-//     await sendKushalMail()
-//     console.log('Sending mail on:', now);
-//   });
-  
-//   cron.schedule('0 0 26-31 * *', async () => {
-//     const now = new Date();
-//     const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-//     if (lastDayOfMonth - now.getDate() < 3) {
-//       console.log('Sending mail on:', now);
-//       await sendKushalMail()
-//     }
-//   });
-
-
-  // cron for test runs every 10 mins // comment this for prod
-  
-  // cron.schedule('*/10 * * * *', async () => {
-  //  const now = new Date();
-  //    console.log('Sending mail on:', now);
-  //    await sendKushalMail()
-  //  });
   
 
 
-  async function sendKushalMail(){
-    try {
-      let dt = new Date().getTime();
-      await mailServiceCntrl.sendKushalMail();
-      // accessLog( new Date().getTime() - dt, result.success);
-     
-    } catch (e:any){
-      log.logger("error", `sendKushalMail Exception ${e.message}, ${e.stack}`);
-    }
-  }
   
 
 router.post('/login', async (req, res) =>{
@@ -111,30 +78,97 @@ router.post('/login', async (req, res) =>{
 
   router.get('/employees', async (req:any, res) => {
     try {
-      let result = await glowOutCntrl.employees();
+      let result = await GlowOutCntrl.employees();
       res.json(result); 
     } catch (e:any){
-      res.json({ success: false,methodName:"getAllStudents", error: true, message: e.message });
+      res.json({ success: false,methodName:"employees", error: true, message: e.message });
     }
   });
 
   router.get('/allAppointments', async (req:any, res) => {
     try {
-      let result = await glowOutCntrl.allAppointments();
+      let result = await GlowOutCntrl.allAppointments();
       // console.log('employees result:', result)
       res.json(result); 
     } catch (e:any){
-      res.json({ success: false,methodName:"getAllStudents", error: true, message: e.message });
+      res.json({ success: false,methodName:"allAppointments", error: true, message: e.message });
     }
   });
 
   router.get('/calAppointments', async (req:any, res) => {
     try {
-      let result = await glowOutCntrl.calAppointments();
+      let result = await GlowOutCntrl.calAppointments();
       // console.log('employees result router:', result)
       res.json(result); 
     } catch (e:any){
-      res.json({ success: false,methodName:"getAllStudents", error: true, message: e.message });
+      res.json({ success: false,methodName:"calAppointments", error: true, message: e.message });
+    }
+  });
+
+  router.get('/allServices', async (req:any, res) => {
+    try {
+      let result = await GlowOutCntrl.allServices();
+      // console.log('employees result router:', result)
+      res.json(result); 
+    } catch (e:any){
+      res.json({ success: false,methodName:"allServices", error: true, message: e.message });
+    }
+  });
+
+  router.get('/showEmployee/1', async (req:any, res) => {
+    try {
+      const param = req.body;
+      console.log('showEmployee param:', param)
+      let result = await GlowOutCntrl.showEmployee();
+      // console.log('employees result router:', result)
+      res.json(result); 
+    } catch (e:any){
+      res.json({ success: false,methodName:"showEmployee", error: true, message: e.message });
+    }
+  });
+
+  router.get('/allClients', async (req:any, res) => {
+    try {
+      const param = req.body;
+      let result = await GlowOutCntrl.showEmployee();
+      // console.log('employees result router:', result)
+      res.json(result); 
+    } catch (e:any){
+      res.json({ success: false,methodName:"allClients", error: true, message: e.message });
+    }
+  });
+
+  router.get('/showSalon', async (req:any, res) => {
+    try {
+      const param = req.body;
+      let result = await GlowOutCntrl.showSalon();
+      // console.log('employees result router:', result)
+      res.json(result); 
+    } catch (e:any){
+      res.json({ success: false,methodName:"showSalon", error: true, message: e.message });
+    }
+  });
+
+  router.get('/services', async (req:any, res) => {
+    try {
+      const param = req.body;
+      let result = await GlowOutCntrl.services();
+      // console.log('employees result router:', result)
+      res.json(result); 
+    } catch (e:any){
+      res.json({ success: false,methodName:"services", error: true, message: e.message });
+    }
+  });
+
+  router.post('/addEmp', async (req:any, res) => {
+    try {
+      const param = req.body;
+      console.log('param:', param)
+      let result = await GlowOutCntrl.addEmp(param);
+      // console.log('employees result router:', result)
+      res.json(result); 
+    } catch (e:any){
+      res.json({ success: false,methodName:"addEmp", error: true, message: e.message });
     }
   });
 
@@ -194,9 +228,10 @@ router.post('/changeForgottenPassword', async (req:any, res) => {
 
 
   router.use(async (req: any, res, next) => {
+    console.log('req:', req)
     const token = req.headers['authorization'];
     if (!token) {
-        res.json({ success: false, invalidToken: true, message: 'No token provided' });
+        res.json({ success: true, invalidToken: true, message: 'No token provided' });
     } else {
         let result = usrCntrl.validateToken(token);
         if (result.success) {
@@ -301,203 +336,15 @@ router.post('/getAssmntStatus', async (req:any, res) => {
     }
   });
 
-router.post('/getDineStatus', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let param = JSON.parse(config.decrypt(req.body.param));
-      let result = await usrCntrl.getDineStatus(param);
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getDineStatus Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getDineStatus", error: true, message: e.message });
-    }
-  });
 
-router.get('/getAllStudents', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let result = await usrCntrl.getAllStudents();
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getAllStudents Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getAllStudents", error: true, message: e.message });
-    }
-  });
 
-router.post('/getAllReports', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let param = JSON.parse(config.decrypt(req.body.param));
-      let result = await usrCntrl.getAllReports(param);
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getAllReports Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getAllReports", error: true, message: e.message });
-    }
-  });
 
-router.get('/getNeighbourStressed', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      // let param = JSON.parse(config.decrypt(req.body.param));
-      let result = await usrCntrl.getNeighbourStressed();
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getNeighbourStressed Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getNeighbourStressed", error: true, message: e.message });
-    }
-  });
 
-router.get('/getAllStressAssemntDineCount', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let result = await usrCntrl.getAllStressAssemntDineCount();
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getAllStressAssemntDineCount Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getAllStressAssemntDineCount", error: true, message: e.message });
-    }
-  });
 
-router.get('/getAllAssmntReports', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let result = await usrCntrl.getAllAssmntReports();
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getAllAssmntReports Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getAllAssmntReports", error: true, message: e.message });
-    }
-  });
 
-router.get('/getAllDineReports', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let result = await usrCntrl.getAllDineReports();
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getAllDineReports Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getAllDineReports", error: true, message: e.message });
-    }
-  });
 
-router.post('/getfilterReportbyDept', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let param = JSON.parse(config.decrypt(req.body.param));
-      let result = await usrCntrl.getfilterReportbyDept(param);
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getfilterReportbyDept Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getfilterReportbyDept", error: true, message: e.message });
-    }
-  });
 
-router.get('/getDepartments', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let result = await usrCntrl.getDepartments();
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getDepartments Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getDepartments", error: true, message: e.message });
-    }
-  });
 
-router.get('/getKushalWeek', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let result = await usrCntrl.getKushalWeek();
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getKushalWeek Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getKushalWeek", error: true, message: e.message });
-    }
-  });
 
-  router.post('/getCounsellorStuDetails', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let param = JSON.parse(config.decrypt(req.body.param));
-      let result = await usrCntrl.getCounsellorStuDetails(param);
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getCounsellorStuDetails Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getCounsellorStuDetails", error: true, message: e.message });
-    }
-  });
 
-  router.post('/updateCounsellorStuStatus', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let param = JSON.parse(config.decrypt(req.body.param));
-      let result = await usrCntrl.updateCounsellorStuStatus(param);
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `updateCounsellorStuStatus Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"updateCounsellorStuStatus", error: true, message: e.message });
-    }
-  });
-
-  router.get('/counsellorStuMapDetails', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let result = await usrCntrl.counsellorStuMapDetails();
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `counsellorStuMapDetails Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"counsellorStuMapDetails", error: true, message: e.message });
-    }
-  });
-
-  router.get('/getCounsellorDetails', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let result = await usrCntrl.getCounsellorDetails();
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getCounsellorDetails Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getCounsellorDetails", error: true, message: e.message });
-    }
-  });
-
-  router.get('/getAllCounsellingReport', async (req:any, res) => {
-    try {
-      let dt = new Date().getTime();
-      let result = await usrCntrl.getAllCounsellingReport();
-      accessLog(req, new Date().getTime() - dt, result.success);
-      res.json(result);
-     
-    } catch (e:any){
-      log.logger("error", `getAllCounsellingReport Exception ${e.message}, ${e.stack}`);
-      res.json({ success: false,methodName:"getAllCounsellingReport", error: true, message: e.message });
-    }
-  });
+ 

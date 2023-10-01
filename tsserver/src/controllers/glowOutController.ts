@@ -9,8 +9,11 @@ const log = require("../log");
 
  
 let glowOutClass = new GlowOutModel();
+// export class GlowOutCntrl {
+// constructor(){ }
 
 async function employees(){
+  console.log('in')
     try{ 
      
       let result = await glowOutClass.employees();
@@ -66,5 +69,158 @@ async function allAppointments(){
   }
 
 
+  async function allServices(){
+    try{ 
+     
+      let result = await glowOutClass.allServices();
+    
+      if (result.success){     
+              return {success:true, rowCount:result.rowCount, result:result.rows, data:result.rows};         
+        } else {
+          return {success: false, message: result.message};
+        }
+    }catch(e:any){
+      return {success:false, message:e.message};
+    }
+  }
 
-export = {employees, allAppointments, calAppointments };
+  async function addEmp(param:any){
+    try{ 
+     
+      let result = await glowOutClass.addEmp(param);
+    
+      if (result.success){     
+              return {success:true, rowCount:result.rowCount, result:result.rows, data:result.rows};         
+        } else {
+          return {success: false, message: result.message};
+        }
+    }catch(e:any){
+      return {success:false, message:e.message};
+    }
+  }
+
+  async function showEmployee(){
+    try{ 
+     
+      let result = await glowOutClass.showEmployee();
+    
+      if (result.success){     
+              return {success:true, rowCount:result.rowCount, result:result.rows, data:result.rows};         
+        } else {
+          return {success: false, message: result.message};
+        }
+    }catch(e:any){
+      return {success:false, message:e.message};
+    }
+  }
+
+  async function allClients(){
+    try{ 
+     
+      let result = await glowOutClass.allClients();
+    
+      if (result.success){     
+              return {success:true, rowCount:result.rowCount, result:result.rows, data:result.rows};         
+        } else {
+          return {success: false, message: result.message};
+        }
+    }catch(e:any){
+      return {success:false, message:e.message};
+    }
+  }
+
+  async function showSalon(){
+    try{ 
+     
+      let result = await glowOutClass.showSalon();
+
+      let sunCheck = false;
+      let monCheck = false;
+      let tueCheck = false;
+      let wedCheck = false;
+      let thuCheck = false;
+      let friCheck = false;
+      let satCheck = false;
+      result.rows.map((val:any)=>{
+       if (val.sun === null || val.sun === '') {
+        sunCheck = true;
+      }
+    
+      if (val.mon === null || val.mon === '') {
+        monCheck = true;
+      }
+    
+      if (val.tue === null || val.tue === '') {
+        tueCheck = true;
+      }
+    
+      if (val.wed === null || val.wed === '') {
+        wedCheck = true;
+      }
+    
+      if (val.thu === null || val.thu === '') {
+        thuCheck = true;
+      }
+    
+      if (val.fri === null || val.fri === '') {
+        friCheck = true;
+      }
+    
+      if (val.sat === null || val.sat === '') {
+        satCheck = true;
+      }
+      val['sunCheck'] = sunCheck;
+      val['monCheck'] = monCheck;
+      val['tueCheck'] = tueCheck;
+      val['wedCheck'] = wedCheck;
+      val['thuCheck'] = thuCheck;
+      val['friCheck'] = friCheck;
+      val['satCheck'] = satCheck;
+      })
+
+      console.log('resulr.rows',result.rows)
+    
+      if (result.success){     
+              return {success:true, rowCount:result.rowCount, result:result.rows, data:result.rows};         
+        } else {
+          return {success: false, message: result.message};
+        }
+    }catch(e:any){
+      return {success:false, message:e.message};
+    }
+  }
+
+  async function services(){
+    try{ 
+     
+      let data:any = {}
+      let salon = await glowOutClass.showSalon();
+      let categories = await glowOutClass.category()
+      // console.log('categories:', categories)
+
+      categories.rows.forEach(async(category:any) => {
+        let service = await glowOutClass.service(category.cat_id);
+        category['services'] = service.rows[0]
+        // console.log('category.services:', category)
+      });
+
+      // console.log('categories:', categories)
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      data['category'] = categories.rows;
+      // console.log('data:', data['categories'])
+
+    
+      if (salon.success){     
+              return {success:true, rowCount:salon.rowCount, result:data, data:data};         
+        } else {
+          return {success: false, message: salon.message};
+        }
+    }catch(e:any){
+      return {success:false, message:e.message};
+    }
+  }
+
+
+
+
+export = {employees, allAppointments, calAppointments, allServices, addEmp, showEmployee, allClients, showSalon, services };
