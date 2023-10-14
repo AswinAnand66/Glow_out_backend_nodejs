@@ -99,6 +99,50 @@ async function allAppointments(){
     }
   }
 
+  async function timeslot(param:any){
+    try{ 
+     
+      let result: any = {}
+      result['rows'] = [
+            {
+                "start_time": "09:00 AM",
+                "end_time": "09:30 AM"
+            },
+            {
+                "start_time": "09:30 AM",
+                "end_time": "10:00 AM"
+            },
+            {
+                "start_time": "10:00 AM",
+                "end_time": "10:30 AM"
+            },
+            {
+                "start_time": "10:30 AM",
+                "end_time": "11:00 AM"
+            },
+            {
+                "start_time": "11:00 AM",
+                "end_time": "11:30 AM"
+            },
+            {
+                "start_time": "11:30 AM",
+                "end_time": "12:00 PM"
+            }
+        ]
+    result['success'] = true;
+    result['msg'] = 'Time slots'
+
+
+      if (result.success){     
+              return {success:true, rowCount:result.rowCount, result:result.rows, data:result.rows};         
+        } else {
+          return {success: false, message: result.message};
+        }
+    }catch(e:any){
+      return {success:false, message:e.message};
+    }
+  }
+
   async function showEmployee(){
     try{ 
      
@@ -118,6 +162,21 @@ async function allAppointments(){
     try{ 
      
       let result = await glowOutClass.allClients();
+    
+      if (result.success){     
+              return {success:true, rowCount:result.rowCount, result:result.rows, data:result.rows};         
+        } else {
+          return {success: false, message: result.message};
+        }
+    }catch(e:any){
+      return {success:false, message:e.message};
+    }
+  }
+
+  async function selectEmp(param:any){
+    try{ 
+     
+      let result = await glowOutClass.selectEmp(param);
     
       if (result.success){     
               return {success:true, rowCount:result.rowCount, result:result.rows, data:result.rows};         
@@ -223,4 +282,4 @@ async function allAppointments(){
 
 
 
-export = {employees, allAppointments, calAppointments, allServices, addEmp, showEmployee, allClients, showSalon, services };
+export = {employees, allAppointments, calAppointments, allServices, addEmp, showEmployee, allClients, showSalon, services, timeslot, selectEmp };
